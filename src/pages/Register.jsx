@@ -1,7 +1,8 @@
 import { React, useState } from 'react'
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth, storage } from '../firebase';
+import { auth, storage,db } from '../firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore"; 
 
 const Register = () => {
    const [err, setErr] = useState(false)
@@ -34,8 +35,15 @@ uploadTask.on('state_changed',
               photoURL:downloadURL
 
             });
-            
+            //syntax db , list to which added , id 
+            await setDoc(doc(db,"users", res.user.uid), {
+              uid:res.user.uid,
+              displayName,
+              email,
+              photoURL:downloadURL
+            });
     });
+    
   }
 );
    }
