@@ -21,27 +21,30 @@ try{
   const res = await createUserWithEmailAndPassword(auth,email,password);
 
 
-const storageRef = ref(storage, displayName);
-
+  const storageRef = ref(storage, displayName);
 const uploadTask = uploadBytesResumable(storageRef, file);
 uploadTask.on('state_changed', 
-  (err) => {
-     setErr(true);
-  }, 
+
   () => {
     getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+      try{
+        //updating user profile using async await , as the function is asynchronus , and we want want to update profile first before storing it in data base uski wajah se hi updateprofile with await was called first than await setDoc
             await updateProfile(res.user,{
               displayName,
               photoURL:downloadURL
 
             });
             //syntax db , list to which added , id 
+            //storing user data in database
             await setDoc(doc(db,"users", res.user.uid), {
               uid:res.user.uid,
               displayName,
               email,
               photoURL:downloadURL
-            });
+            });}
+            catch(err){
+               setErr(true);
+            }
     });
     
   }
@@ -77,3 +80,4 @@ catch(err){
 }
 
 export default Register
+
